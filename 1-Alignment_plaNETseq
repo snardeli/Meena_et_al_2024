@@ -43,6 +43,3 @@ for file in *sorted.bam; do echo $file && samtools index $file && umi_tools dedu
 # zcat Araport11_GFF3_genes_transposons.201606.gff.gz | sed '/^#/d;s/^Chr//;s/^C/Pt/;s/^M/Mt/' | awk 'BEGIN{OFS="\t"}{if ($3=="rRNA" || $3=="tRNA" || $3=="snRNA" || $3=="snoRNA") print $1,$4-100,$5+100,$7}' | sort -k1,1 -k2,2n > Unwanted.bed
 
 
-## ngsplot
-ngs.plot.r -G Tair10 -R bed -E <custom bed file> -C config with bam and bed file names metagene profiles>
- 
