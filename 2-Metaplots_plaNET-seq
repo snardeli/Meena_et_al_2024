@@ -1,4 +1,4 @@
 ## To create metaplots for both sense and antisense RNA for target genes on plaNET-seq processed data, ngs.plot.r (https://github.com/shenlab-sinai/ngsplot) was used:
 
-$ ngs.plot.r -G Tair10 -R bed -E <here is the name of custom bed file> -C <here is the gene config file with bam files names and also bed file names metagene profiles>
+ngs.plot.r -G Tair10 -R bed -E <here is the name of custom bed file> -C <here is the gene config file with bam files names and also bed file names metagene profiles>
  
