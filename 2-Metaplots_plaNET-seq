@@ -1,5 +1,6 @@
-## To create metaplots for both sense and antisense RNA for target genes on plaNET-seq processed data, ngs.plot.r (https://github.com/shenlab-sinai/ngsplot) was used:
+## To create metaplots for both sense and antisense RNA for target genes on plaNET-seq processed data, [ngs.plot.r](https://github.com/shenlab-sinai/ngsplot) was used:
 
-ngs.plot.r -G Tair10 -R bed -E <here is the name of custom bed file> -C < config file with plaNET-seq merged bam files>
- 
-# For the metaplots centered on the first nucleosomes, the TSS annotation was retrieved from GSE113677 and DANPOS2 (https://sites.google.com/site/danposdoc/home) was used to find the first nucleosomes' positioning prior to ngs.plot.
+```bash
+ngs.plot.r -G Tair10 -R bed -E <here is the name of custom bed file> -C <config file with plaNET-seq merged bam files>
+
+For the metaplots centered on the first nucleosomes, the TSS annotation was retrieved from GSE113677 and DANPOS2 was used to find the first nucleosomes' positioning prior to ngs.plot.
