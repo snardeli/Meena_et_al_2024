@@ -5,19 +5,24 @@ $ sort -k1,1 -k2,2n ChIPseq_PolII_WT_ChIP_merged.bedgraph > sorted.bedGraph
 $ /bedGraphToBigWig sorted.bedGraph TAIR10-SIZES myBigWig.bw
 $ grep -Fwf genes_of_interest.txt genes.bed > genes_of_interest.bed
 
+## Preparing files for PolII ChIP-seq metaplots
+
+$ sort -k1,1 -k2,2n ChIPseq_PolII_WT_ChIP_merged.bedgraph > sorted.bedGraph
+
+$ /bedGraphToBigWig sorted.bedGraph TAIR10-SIZES myBigWig.bw
+$ grep -Fwf genes_of_interest.txt genes.bed > genes_of_interest.bed
+
 ## Deeptools Computing_matrix 
 # https://deeptools.readthedocs.io/en/develop/content/tools/computeMatrix.html#Required%20arguments_repeat1
 
 ## Compute matrices at different features
 # Usage: <input_beds> <input_bw> <out_dir> <out_name>
 
-# fullgene
-computeMatrix scale-regions \
+$ computeMatrix scale-regions \
     -R $bed \
     -S $bigwig \
     --unscaled5prime 150 \
     --unscaled3prime 150 \
     -b 500 -a 500 \
     -bs 5 -p "max" --missingDataAsZero --skipZeros \
-    -o $_genebody_multi.gz"
-
+    -o $_genebody_multi.gz
