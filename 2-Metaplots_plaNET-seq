@@ -3,4 +3,4 @@
 ```bash
 ngs.plot.r -G Tair10 -R bed -E <here is the name of custom bed file> -C <config file with plaNET-seq merged bam files>
 
-For the metaplots centered on the first nucleosomes, the TSS annotation was retrieved from GSE113677 and DANPOS2 was used to find the first nucleosomes' positioning prior to ngs.plot.
+# For the metaplots centered on the first nucleosomes, the TSS annotation was retrieved from GSE113677 and DANPOS2 (https://sites.google.com/site/danposdoc/home) was used to find the first nucleosomes' positioning prior to ngs.plot.
