@@ -1,22 +1,13 @@
-## Preparing files for PolII ChIP-seq metaplots
+## Preparing files for PolII ChIP-seq metaplots from GSE95301 study (doi: 10.1016/j.devcel.2017.12.002)
+# GSM2522253 and GSM2522254 for PolII_WT were merged and converted to bigwig
 
 $ sort -k1,1 -k2,2n ChIPseq_PolII_WT_ChIP_merged.bedgraph > sorted.bedGraph
-
 $ /bedGraphToBigWig sorted.bedGraph TAIR10-SIZES myBigWig.bw
 $ grep -Fwf genes_of_interest.txt genes.bed > genes_of_interest.bed
 
-## Preparing files for PolII ChIP-seq metaplots
-
-$ sort -k1,1 -k2,2n ChIPseq_PolII_WT_ChIP_merged.bedgraph > sorted.bedGraph
-
-$ /bedGraphToBigWig sorted.bedGraph TAIR10-SIZES myBigWig.bw
-$ grep -Fwf genes_of_interest.txt genes.bed > genes_of_interest.bed
-
-## Deeptools Computing_matrix 
-# https://deeptools.readthedocs.io/en/develop/content/tools/computeMatrix.html#Required%20arguments_repeat1
+## Deeptools Computing_matrix was used to build metaplots (https://deeptools.readthedocs.io/en/develop/content/tools/computeMatrix.html#Required%20arguments_repeat1)
 
 ## Compute matrices at different features
-# Usage: <input_beds> <input_bw> <out_dir> <out_name>
 
 $ computeMatrix scale-regions \
     -R $bed \
