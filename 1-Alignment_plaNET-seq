@@ -1,18 +1,19 @@
 # From Kindgren et al., 2019 (doi: 10.1093/nar/gkz1189), the raw plaNET-seq data was retrieved and analysed as follows:
 
 # Remove RA3 and RA5 adapter sequences
-# RA3=TGGAATTCTCGGGTGCCAAGG
-# Illumina 5' Adapter=GATCGTCGGACT
-
-for f1 in *_1.fastq; do f2=${f1/_1/_2} && echo $f1 $f2 && \
-cutadapt -a TGGAATTCTCGGGTGCCAAGG -A GATCGTCGGACT --minimum-length 20 \
-  -o ${f1/.fastq/_clean.fastq} -p ${f2/.fastq/_clean.fastq} ${f1} ${f2} > status/cutadapt_report_${name}.txt; done
+for f1 in *_1.fastq; do
+    f2=${f1/_1/_2} && echo $f1 $f2 && \
+    cutadapt -a TGGAATTCTCGGGTGCCAAGG -A GATCGTCGGACT --minimum-length 20 \
+    -o ${f1/.fastq/_clean.fastq} -p ${f2/.fastq/_clean.fastq} ${f1} ${f2} > status/cutadapt_report_${name}.txt
+done
 
 # Trim UMIs from both R1 and R2:
-for f1 in *_1_clean.fastq; do f2=${f1/_1/_2} && echo $f1 $f2 && \
-python3 ~/sarahmuniznardeli/.local/bin/umi_tools extract \
---stdin=${f1} --read2-in=${f2} --bc-pattern=NNNN --bc-pattern2=NNNN \
---stdout=${f1/.fastq/_UMI.fastq} --read2-out=${f2/.fastq/_UMI.fastq}; done && \
+for f1 in *_1_clean.fastq; do
+    f2=${f1/_1/_2} && echo $f1 $f2 && \
+    python3 ~/sarahmuniznardeli/.local/bin/umi_tools extract \
+    --stdin=${f1} --read2-in=${f2} --bc-pattern=NNNN --bc-pattern2=NNNN \
+    --stdout=${f1/.fastq/_UMI.fastq} --read2-out=${f2/.fastq/_UMI.fastq}
+done && \
 fastqc -q *.fastq -o fastqc/
 
 # Build STAR index based on TAIR10 
@@ -20,26 +21,35 @@ fastqc -q *.fastq -o fastqc/
 # ANNOT=~/sarahmuniznarde/genomes/annotation/Arabidopsis_thaliana.TAIR10.52.gff3
 # IDX_out=~/sarahmuniznardeli/genomes/index/STAR/
 # mkdir ~/sarahmuniznardeli/index/STAR
-# STAR --runMode genomeGenerate --genomeSAindexNbases 12 --genomeDir $IDX_out --genomeFastaFiles $GENOME --runThreadN 8 --sjdbGTFfile $ANNOT --sjdbGTFtagExonParentTranscript Parent
-
+& STAR --runMode genomeGenerate --genomeSAindexNbases 12 --genomeDir $IDX_out --genomeFastaFiles $GENOME --runThreadN 8 --sjdbGTFfile $ANNOT --sjdbGTFtagExonParentTranscript Parent
 
 # Align to TAIR10 in SE mode (use only R2):
 ANNOT=~/sarahmuniznardeli/genomes/annotation/Arabidopsis_thaliana.TAIR10.52.gff3
 IDX_out=~/sarahmuniznardeli/genomes/index/STAR/
-for file in *_2_clean_UMI.fastq; do echo $file && STAR --genomeDir $IDX_out --readFilesIn $file --runThreadN 8 --outFileNamePrefix ${file/_2_clean_UMI.fastq/_} --outSAMmultNmax 1 --alignEndsType Extend5pOfRead1 --clip3pAdapterSeq GATCGTCGGACT --outSAMtype BAM Unsorted --sjdbGTFfile $ANNOT --sjdbGTFtagExonParentTranscript Parent --outSAMstrandField intronMotif; done
+for file in *_2_clean_UMI.fastq; do
+    echo $file && STAR --genomeDir $IDX_out --readFilesIn $file --runThreadN 8 --outFileNamePrefix ${file/_2_clean_UMI.fastq/_} --outSAMmultNmax 1 --alignEndsType Extend5pOfRead1 --clip3pAdapterSeq GATCGTCGGACT --outSAMtype BAM Unsorted --sjdbGTFfile $ANNOT --sjdbGTFtagExonParentTranscript Parent --outSAMstrandField intronMotif
+done
 
-for file in *Aligned*; do mv $file ${file/_Aligned.out/}; done
-for file in *final.out; do mv $file ./status/STAR/; done
+for file in *Aligned*; do
+    mv $file ${file/_Aligned.out/}
+done
+
+for file in *final.out; do
+    mv $file ./status/STAR/
+done
+
 rm -r *STARgenome *STARtmp *out *tab
 
 # Sort BAM files:
-for file in *bam; do echo $file && samtools sort $file -o ${file/.bam/_sorted.bam} && rm $file; done
+for file in *bam; do
+    echo $file && samtools sort $file -o ${file/.bam/_sorted.bam} && rm $file
+done
 
 # Deduplicate (UMI-Tools):
-for file in *sorted.bam; do echo $file && samtools index $file && umi_tools dedup --stdin=${file} --stdout=${file/.bam/_dedup.bam}; done 
+for file in *sorted.bam; do
+    echo $file && samtools index $file && umi_tools dedup --stdin=${file} --stdout=${file/.bam/_dedup.bam}
+done
 
-## (Optional) Extract coordinates of non-RNAPII-transcribed genes (rRNA, tRNA, snRNA, snoRNA) from Araport11:
+## Extract coordinates of non-RNAPII-transcribed genes (rRNA, tRNA, snRNA, snoRNA) from Araport11:
 # Download Araport11_GFF3_genes_transposons.201606.gff.gz from www.arabidopsis.org;
-# zcat Araport11_GFF3_genes_transposons.201606.gff.gz | sed '/^#/d;s/^Chr//;s/^C/Pt/;s/^M/Mt/' | awk 'BEGIN{OFS="\t"}{if ($3=="rRNA" || $3=="tRNA" || $3=="snRNA" || $3=="snoRNA") print $1,$4-100,$5+100,$7}' | sort -k1,1 -k2,2n > Unwanted.bed
-
-
+zcat Araport11_GFF3_genes_transposons.201606.gff.gz | sed '/^#/d;s/^Chr//;s/^C/Pt/;s/^M/Mt/' | awk 'BEGIN{OFS="\t"}{if ($3=="rRNA" || $3=="tRNA" || $3=="snRNA" || $3=="snoRNA") print $1,$4-100,$5+100,$7}' | sort -k1,1 -k2,2n > Unwanted.bed
